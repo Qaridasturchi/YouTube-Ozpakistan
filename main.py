@@ -11,13 +11,13 @@ from pyrogram.types import (
    InputTextMessageContent,
 )
 
-api_id = int(os.environ.get("APP_ID"))
-api_hash = os.environ.get("API_HASH")
-token = os.environ.get("TOKEN")
+api_id = '10356241'
+api_hash = 'fbea11b5323c324387089425cda209b9'
+token = '5146899202:AAHCp3RoH9sD0BPyT_haQQxh_aAfinHGF3Y'
 
 app = Client("yt", bot_token=token, api_id = api_id, api_hash = api_hash)
 
-Sudo_id = '1390519416'
+Sudo_id = '1909129025'
 @app.on_message(ay.command("start"))
 async def start(client, message):
    await message.reply_text(
