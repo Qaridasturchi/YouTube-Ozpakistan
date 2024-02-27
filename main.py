@@ -1,6 +1,5 @@
 from pyrogram import Client, filters as ay
 from yt_dlp import YoutubeDL
-from requests import get
 from youtube_search import YoutubeSearch
 import os, wget
 from pyrogram.types import (
@@ -15,33 +14,33 @@ api_id = '10356241'
 api_hash = 'fbea11b5323c324387089425cda209b9'
 token = '5146899202:AAHCp3RoH9sD0BPyT_haQQxh_aAfinHGF3Y'
 
-app = Client("yt", bot_token=token, api_id = api_id, api_hash = api_hash)
+app = Client("yt", bot_token=token, api_id=api_id, api_hash=api_hash)
 
 Sudo_id = '1909129025'
 @app.on_message(ay.command("start"))
 async def start(client, message):
    await message.reply_text(
-      "👋┇أهلاً بك عزيزي،\nمع البوت يمكنك\nتحميل من اليوتيوب بصيغ\nمتعددة والاستماع اليها في أي وقت\nمع ميزه البحث فقط اكتب بحث +\nالكلمه",
+      "👋 Welcome!\nWith this bot, you can download videos and audios from YouTube in various formats and listen to them anytime. Just type 'search' followed by your query to get started.",
       reply_markup=InlineKeyboardMarkup(
          [
             [
-               InlineKeyboardButton("❕ ┇ كيفيه استخدام البوت", url=f"https://t.me/MuzXMusicc"),
-               InlineKeyboardButton("", url=f"https://t.me/MuzXMusicc"),
+               InlineKeyboardButton("❕ How to use the bot", url="https://t.me/MuzXMusicc"),
+               InlineKeyboardButton("", url="https://t.me/MuzXMusicc"),
             ]
          ]
       )
    )
-   await client.send_message(chat_id=Sudo_id,text=f"العضو : {message.from_user.mention()}\nضغط start في بوتك\nالايدي : `{message.from_user.id}`")
+   await client.send_message(chat_id=Sudo_id,text=f"User: {message.from_user.mention()}\nPressed start in your bot\nID: `{message.from_user.id}`")
 
 @app.on_message(ay.regex(r"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$"))
 async def ytdl(client, message):
    await message.reply_text(
-      f"🎬  : {message.text}",disable_web_page_preview=True,
+      f"🎬  : {message.text}", disable_web_page_preview=True,
       reply_markup=InlineKeyboardMarkup(
          [
             [
-               InlineKeyboardButton("🎧 مقطع صوتي .", callback_data="audio"),
-               InlineKeyboardButton("🎬 مقطع فيديو .", callback_data="video"),
+               InlineKeyboardButton("🎧 Audio", callback_data="audio"),
+               InlineKeyboardButton("🎬 Video", callback_data="video"),
             ]
          ]
       )
@@ -49,17 +48,17 @@ async def ytdl(client, message):
 
 @app.on_callback_query(ay.regex("video"))
 async def VideoDownLoad(client, callback_query):
-   await callback_query.edit_message_text("*🎚 ┇ يتم قياس حجم التحميل*")
+   await callback_query.edit_message_text("*🎚 Measuring download size*")
    try:
-      url = callback_query.message.text.split(' : ',1)[1]
-      with YoutubeDL(video) as ytdl:
-         await callback_query.edit_message_text("*♻️┇جاري التحميل...*")
+      url = callback_query.message.text.split(' : ', 1)[1]
+      with YoutubeDL() as ytdl:
+         await callback_query.edit_message_text("*♻️ Downloading...*")
          ytdl_data = ytdl.extract_info(url, download=True)
          video_file = ytdl.prepare_filename(ytdl_data)
    except Exception as e:
       await client.send_message(chat_id=Sudo_id,text=e)
       return await callback_query.edit_message_text(e)
-   await callback_query.edit_message_text("*🚀 يتم الرفع علي خوادم تلكرام *")
+   await callback_query.edit_message_text("*🚀 Uploading to Telegram servers*")
    await client.send_video(
             callback_query.message.chat.id,
             video=video_file,
@@ -68,23 +67,23 @@ async def VideoDownLoad(client, callback_query):
             supports_streaming=True,
             caption=f"[{ytdl_data['title']}]({url})"
         )
-   await callback_query.edit_message_text("Done Send Video 🚧")
+   await callback_query.edit_message_text("Done sending video 🚧")
    os.remove(video_file)
 
 @app.on_callback_query(ay.regex("audio"))
 async def AudioDownLoad(client, callback_query):
-   await callback_query.edit_message_text("*🎚 ┇ يتم قياس حجم التحميل*")
+   await callback_query.edit_message_text("*🎚 Measuring download size*")
    try:
-      url = callback_query.message.text.split(' : ',1)[1]
-      with YoutubeDL(audio) as ytdl:
-         await callback_query.edit_message_text("*♻️┇جاري التحميل...*")
+      url = callback_query.message.text.split(' : ', 1)[1]
+      with YoutubeDL() as ytdl:
+         await callback_query.edit_message_text("*♻️ Downloading...*")
          ytdl_data = ytdl.extract_info(url, download=True)
          audio_file = ytdl.prepare_filename(ytdl_data)
          thumb = wget.download(f"https://img.youtube.com/vi/{ytdl_data['id']}/hqdefault.jpg")
    except Exception as e:
       await client.send_message(chat_id=Sudo_id,text=e)
       return await callback_query.edit_message_text(e)
-   await callback_query.edit_message_text("*🚀 يتم الرفع علي خوادم تلكرام *")
+   await callback_query.edit_message_text("*🚀 Uploading to Telegram servers*")
    await client.send_audio(
       callback_query.message.chat.id,
       audio=audio_file,
@@ -95,20 +94,19 @@ async def AudioDownLoad(client, callback_query):
       thumb=thumb,
       caption=f"[{ytdl_data['title']}]({url})"
    )
-   await callback_query.edit_message_text("Done Send Video 🚧")
+   await callback_query.edit_message_text("Done sending audio 🚧")
    os.remove(audio_file)
    os.remove(thumb)
 
-
-@app.on_message(ay.command("بحث",None))
+@app.on_message(ay.command("search", None))
 async def search(client, message):
     try:
         query = message.text.split(None, 1)[1]
         if not query:
-            await message.reply_text("استخدم الامر هكذا ( بحث + الكلمه )")
+            await message.reply_text("Please use the command like this: search + keyword")
             return
 
-        m = await message.reply_text("يتم البحث انتضر قليلا ...")
+        m = await message.reply_text("Searching, please wait...")
         results = YoutubeSearch(query, max_results=5).to_dict()
         i = 0
         text = ""
@@ -119,7 +117,7 @@ async def search(client, message):
             text += f"🌐 {results[i]['channel']}\n"
             text += f"🔗 https://www.youtube.com{results[i]['url_suffix']}\n\n"
             i += 1
-        await m.edit(text, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Xavfsizlikdan ⁞ Bots ozbakistan", url="https://t.me/MuzXMusicc")]]), disable_web_page_preview=True)
+        await m.edit(text, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Safety and security⁞Bot ownership", url="https://t.me/MuzXMusicc")]]), disable_web_page_preview=True)
     except Exception as e:
         await m.edit(str(e))
 
@@ -139,7 +137,7 @@ async def inline(client, query: InlineQuery):
     else:
         results = YoutubeSearch(search_query).to_dict()
         for result in results:
-         answers.append(
+            answers.append(
                InlineQueryResultArticle(
                   title=result["title"],
                   description="{}, {} views.".format(
@@ -150,7 +148,7 @@ async def inline(client, query: InlineQuery):
                   ),
                   thumb_url=result["thumbnails"][0],
                )
-         )
+            )
         
         try:
             await query.answer(results=answers, cache_time=0)
@@ -161,9 +159,6 @@ async def inline(client, query: InlineQuery):
                 switch_pm_text="Error: search timed out",
                 switch_pm_parameter="",
             )
-            
-video = {"format": "best","keepvideo": True,"prefer_ffmpeg": False,"geo_bypass": True,"outtmpl": "%(title)s.%(ext)s","quite": True}
-audio = {"format": "bestaudio","keepvideo": False,"prefer_ffmpeg": False,"geo_bypass": True,"outtmpl": "%(title)s.mp3","quite": True}
 
 print("The Bot Was Already Started")
 app.run()
